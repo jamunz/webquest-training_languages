@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WEBQUEST PEPE1 - ELECTRICIDAD INTEGRAL</title>
+    <style>
+        :root { --p: #2c3e50; --s: #27ae60; --a: #e67e22; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); display: flex; color: var(--p); }
+        nav { width: 280px; background: var(--p); height: 100vh; position: fixed; color: white; padding: 20px; box-sizing: border-box; overflow-y: auto; }
+        nav h2 { color: var(--a); border-bottom: 2px solid var(--s); padding-bottom: 10px; font-size: 1rem; }
+        nav ul { list-style: none; padding: 0; }
+        nav ul li { margin: 10px 0; }
+        nav ul li a { color: #ecf0f1; text-decoration: none; cursor: pointer; display: block; padding: 10px; border-radius: 4px; font-size: 0.9rem; }
+        nav ul li a:hover { background: rgba(255,255,255,0.1); }
+        main { margin-left: 280px; padding: 40px; width: 100%; max-width: 1000px; }
+        .block { display: none; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .block.active { display: block; }
+        h1 { margin-top: 0; border-left: 5px solid var(--s); padding-left: 15px; }
+        .q { background: #fdfdfd; border: 1px solid #eee; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
+        .tr { font-size: 0.85rem; color: #7f8c8d; font-style: italic; display: block; margin-bottom: 5px; }
+        input[type="text"] { padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 90%; margin-top: 8px; }
+        .ans-btn { background: var(--a); color: white; border: none; padding: 15px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 20px; }
+        .results { display: none; background: #2c3e50; color: white; padding: 20px; border-radius: 8px; margin-top: 20px; white-space: pre-wrap; font-family: monospace; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <h2>EXAMEN PEPE1</h2>
+    <ul>
+        <li><a onclick="sh('b1')">1. Elección Múltiple (10)</a></li>
+        <li><a onclick="sh('b2')">2. Asociar (10)</a></li>
+        <li><a onclick="sh('b3')">3. Completar (10)</a></li>
+        <li><a onclick="sh('b4')">4. Ordenar (10)</a></li>
+        <li><a onclick="sh('b5')">5. Verdadero/Falso (10)</a></li>
+        <li><a onclick="showAns()" style="color:var(--a)">VER HOJA DE RESPUESTAS</a></li>
+    </ul>
+</nav>
+
+<main>
+    <section id="b1" class="block active">
+        <h1>1. Elección Múltiple</h1>
+        <div id="cont-mc"></div>
+    </section>
+
+    <section id="b2" class="block">
+        <h1>2. Asociar (Letra en el cuadro)</h1>
+        <div id="cont-as"></div>
+    </section>
+
+    <section id="b3" class="block">
+        <h1>3. Completar (Morfología)</h1>
+        <div id="cont-fl"></div>
+    </section>
+
+    <section id="b4" class="block">
+        <h1>4. Poner en Orden (Sintaxis)</h1>
+        <div id="cont-or"></div>
+    </section>
+
+    <section id="b5" class="block">
+        <h1>5. Verdadero o Falso</h1>
+        <div id="cont-tf"></div>
+        <button class="ans-btn" onclick="showAns()">FINALIZAR Y VER CORRECCIÓN</button>
+    </section>
+
+    <div id="res" class="results"></div>
+</main>
+
+<script>
+const data = {
+    mc: [
+        { t: "(El técnico comprueba a menudo el voltaje)", q: "The technician ________ checks the voltage.", o: ["checks often", "often checks", "checks always"]},
+        { t: "(¿Qué edad tiene el generador?)", q: "How old ________ the generator?", o: ["has", "is", "does"]},
+        { t: "(Conecta los cables cuidadosamente)", q: "Connect the cables ________.", o: ["careful", "carefully", "carefuly"]},
+        { t: "(Él no tiene un multímetro - Americano)", q: "He ________ a multimeter.", o: ["hasn't got", "doesn't have", "not has"]},
+        { t: "(La corriente fluye específicamente...)", q: "Current flows ________ through the resistor.", o: ["specificaly", "specifically", "specificly"]},
+        { t: "(¿Funciona el LED?)", q: "________ the LED work?", o: ["Do", "Is", "Does"]},
+        { t: "(Tengo hambre - Estado físico)", q: "I ________ hungry.", o: ["have", "am", "do"]},
+        { t: "(El soldador está muy caliente)", q: "Actually, the soldering iron ________ very hot.", o: ["is", "are", "am"]},
+        { t: "(Siempre llegas tarde)", q: "You ________ late.", o: ["always are", "are always", "always is"]},
+        { t: "(La furgoneta sale a las 8:00)", q: "The van ________ at 8:00.", o: ["leaves", "leave", "leavs"]}
+    ],
+    as: [
+        { q: "Multimeter", d: "A. Adverbio de grado (Quite)" },
+        { q: "Quickly", d: "B. Tercera persona acabado en -O" },
+        { q: "Truly", d: "C. Adjetivo acabado en -IC (-ally)" },
+        { q: "Goes", d: "D. Posesión (Estilo Británico)" },
+        { q: "Specifically", d: "E. Adverbio de modo (General)" },
+        { q: "Quite", d: "F. Instrumento (Sujeto)" },
+        { q: "In the workshop", d: "G. Excepción de la regla de la -e" },
+        { q: "Have got", d: "H. Verbo 'To Be' para el clima" },
+        { q: "It's hot today", d: "I. Adverbio de lugar" },
+        { q: "Studies", d: "J. Cambio de -y a -ies" }
+    ],
+    fl: [
+        { t: "(Él conecta el cable)", q: "He __________ (connect) the cable.", a: "connects" },
+        { t: "(No tenemos condensadores - Brit)", q: "We __________ (not / have got) any capacitors.", a: "haven't got" },
+        { t: "(La luna gira alrededor)", q: "The moon __________ (turn) around the earth.", a: "turns" },
+        { t: "(Ella estudia diagramas)", q: "She __________ (study) the diagrams.", a: "studies" },
+        { t: "(Yo nunca llego tarde)", q: "I __________ (never / be) late.", a: "am never" },
+        { t: "(¿Proporciona energía?)", q: "__________ the supply __________ (provide) power?", a: "Does / provide" },
+        { t: "(Vibra ruidosamente)", q: "The motor vibrates __________ (noisy).", a: "noisily" },
+        { t: "(El agua hierve a 100°)", q: "Water __________ (boil) at 100 degrees.", a: "boils" },
+        { t: "(Ella tiene 30 años)", q: "She __________ (be) 30 years old.", a: "is" },
+        { t: "(Casi rompo el fusible)", q: "I __________ (almost) break the fuse.", a: "almost" }
+    ],
+    or: [
+        { t: "(¿Tienes un soldador?)", q: "you / got / have / a / soldering iron / ?", a: "Have you got a soldering iron?" },
+        { t: "(El técnico prueba el circuito)", q: "carefully / the / technician / the / tests / circuit", a: "The technician tests the circuit carefully." },
+        { t: "(El multímetro es preciso)", q: "accurate / the / is / always / multimeter", a: "The multimeter is always accurate." },
+        { t: "(Ellos no hablan francés)", q: "speak / don't / French / they", a: "They don't speak French." },
+        { t: "(La furgoneta sale pronto)", q: "leaves / the / early / van", a: "The van leaves early." },
+        { t: "(Tengo hambre ahora)", q: "hungry / am / now / I", a: "I am hungry now." },
+        { t: "(Ella abre la puerta)", q: "opens / carefully / she / door / the", a: "She opens the door carefully." },
+        { t: "(¿Es hoy un día caluroso?)", q: "hot / is / today / it / ?", a: "Is it hot today?" },
+        { t: "(Nosotros cenamos a las 8)", q: "at 8:00 / have / dinner / we", a: "We have dinner at 8:00." },
+        { t: "(Él repara el motor)", q: "repairs / the / he / motor", a: "He repairs the motor." }
+    ],
+    tf: [
+        { q: "'Truly' mantiene la -e de 'true'.", a: "F" },
+        { q: "La edad se expresa con 'to be'.", a: "V" },
+        { q: "Adverbios en -ic añaden -ally.", a: "V" },
+        { q: "El verbo 'to be' usa 'do' en preguntas.", a: "F" },
+        { q: "En negativas con 'doesn't', el verbo lleva -s.", a: "F" },
+        { q: "Los adverbios de frecuencia van tras 'to be'.", a: "V" },
+        { q: "Vocal + Y (play) cambia a -ies.", a: "F" },
+        { q: "'Actually' significa 'actualmente'.", a: "F" },
+        { q: "'Got' nunca se usa en pasado.", a: "V" },
+        { q: "Adverbios de modo van tras el objeto.", a: "V" }
+    ]
+};
+
+function sh(id) {
+    document.querySelectorAll('.block').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+
+function render() {
+    // MC
+    const mc = document.getElementById('cont-mc');
+    data.mc.forEach((x, i) => {
+        mc.innerHTML += `<div class="q"><span class="tr">${x.t}</span><p>${i+1}. ${x.q}</p>` + 
+        x.o.map(o => `<input type="radio" name="mc${i}">${o}<br>`).join('') + `</div>`;
+    });
+    // AS
+    const as = document.getElementById('cont-as');
+    data.as.forEach((x, i) => {
+        as.innerHTML += `<div class="q">${i+1}. ${x.q} [____] &nbsp;&nbsp; ${x.d}</div>`;
+    });
+    // FL
+    const fl = document.getElementById('cont-fl');
+    data.fl.forEach((x, i) => {
+        fl.innerHTML += `<div class="q"><span class="tr">${x.t}</span><p>${i+1}. ${x.q}</p><input type="text"></div>`;
+    });
+    // OR
+    const or = document.getElementById('cont-or');
+    data.or.forEach((x, i) => {
+        or.innerHTML += `<div class="q"><span class="tr">${x.t}</span><p>${i+1}. (${x.q})</p><input type="text"></div>`;
+    });
+    // TF
+    const tf = document.getElementById('cont-tf');
+    data.tf.forEach((x, i) => {
+        tf.innerHTML += `<div class="q"><p>${i+1}. ${x.q}</p><input type="radio" name="tf${i}"> V <input type="radio" name="tf${i}"> F</div>`;
+    });
+}
+
+function showAns() {
+    const r = document.getElementById('res');
+    r.style.display = 'block';
+    r.innerText = "HOJA DE RESPUESTAS PEPE1\n" + 
+    "\n1. MC: 1-b, 2-b, 3-b, 4-b, 5-b, 6-c, 7-b, 8-a, 9-b, 10-a" +
+    "\n2. AS: 1-F, 2-E, 3-G, 4-B, 5-C, 6-A, 7-I, 8-D, 9-H, 10-J" +
+    "\n3. FL: 1-connects, 2-haven't got, 3-turns, 4-studies, 5-am never, 6-Does/provide, 7-noisily, 8-boils, 9-is, 10-almost" +
+    "\n4. OR: (Revisar orden sintáctico S+V+O+Adv)" +
+    "\n5. TF: 1-F, 2-V, 3-V, 4-F, 5-F, 6-V, 7-F, 8-F, 9-V, 10-V";
+}
+
+render();
+</script>
+</body>
+</html>
